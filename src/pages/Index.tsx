@@ -62,7 +62,7 @@ const loadTiles = (count: number): TileConfig[] => {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as TileConfig[];
-      const result = parsed.map((t) => ({ ...defaultTile(), ...t, videoUrl: null, videoName: null }));
+      const result = parsed.map((t) => ({ ...defaultTile(), ...t }));
       while (result.length < count) result.push(defaultTile());
       return result.slice(0, count);
     }
@@ -103,8 +103,7 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    const toSave = tiles.map((t) => ({ ...t, videoUrl: null, videoName: null }));
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tiles));
   }, [tiles]);
 
   const handleCountChange = (count: number) => {
@@ -126,8 +125,12 @@ const Index = () => {
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    update(selected, { videoUrl: url, videoName: file.name });
+    const reader = new FileReader();
+    reader.onload = (ev) => {
+      const base64 = ev.target?.result as string;
+      update(selected, { videoUrl: base64, videoName: file.name });
+    };
+    reader.readAsDataURL(file);
     e.target.value = "";
   };
 
