@@ -130,12 +130,8 @@ const Index = () => {
       e.target.value = "";
       return;
     }
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      const base64 = ev.target?.result as string;
-      update(selected, { videoUrl: base64, videoName: file.name });
-    };
-    reader.readAsDataURL(file);
+    const url = URL.createObjectURL(file);
+    update(selected, { videoUrl: url, videoName: file.name });
     e.target.value = "";
   };
 
