@@ -15,6 +15,7 @@ type TileConfig = {
   align: "left" | "center" | "right";
   videoUrl: string | null;
   videoName: string | null;
+  bgColor: string;
 };
 
 const defaultTile = (): TileConfig => ({
@@ -25,7 +26,19 @@ const defaultTile = (): TileConfig => ({
   align: "center",
   videoUrl: null,
   videoName: null,
+  bgColor: "rgba(255, 255, 255, 0.15)",
 });
+
+const PRESET_COLORS = [
+  "rgba(255, 255, 255, 0.15)",
+  "rgba(59, 130, 246, 0.4)",
+  "rgba(16, 185, 129, 0.4)",
+  "rgba(239, 68, 68, 0.4)",
+  "rgba(245, 158, 11, 0.4)",
+  "rgba(139, 92, 246, 0.4)",
+  "rgba(236, 72, 153, 0.4)",
+  "rgba(0, 0, 0, 0.35)",
+];
 
 const Index = () => {
   const [tiles, setTiles] = useState<TileConfig[]>(Array.from({ length: 6 }, defaultTile));
@@ -166,6 +179,24 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Цвет фона</label>
+              <div className="flex flex-wrap gap-2">
+                {PRESET_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => update(selected, { bgColor: color })}
+                    className="w-8 h-8 rounded-lg border-2 transition-all"
+                    style={{
+                      background: color,
+                      borderColor: tile.bgColor === color ? "hsl(var(--primary))" : "transparent",
+                      backdropFilter: "blur(4px)",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Видео</label>
               {tile.videoName ? (
                 <div className="flex flex-col gap-2">
@@ -206,7 +237,7 @@ const Index = () => {
                   t.videoUrl ? "cursor-pointer hover:scale-[1.03] active:scale-[0.98]" : ""
                 }`}
                 style={{
-                  background: "rgba(255, 255, 255, 0.15)",
+                  background: t.bgColor,
                   backdropFilter: "blur(12px)",
                   border: t.videoUrl
                     ? "1px solid rgba(255, 255, 255, 0.5)"
