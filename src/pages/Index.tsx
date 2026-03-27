@@ -125,6 +125,11 @@ const Index = () => {
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (file.size > 8 * 1024 * 1024) {
+      alert("Видео слишком большое (более 8 МБ). Выберите файл меньшего размера.");
+      e.target.value = "";
+      return;
+    }
     const reader = new FileReader();
     reader.onload = (ev) => {
       const base64 = ev.target?.result as string;
