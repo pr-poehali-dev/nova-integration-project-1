@@ -78,6 +78,7 @@ const Index = () => {
   const [selected, setSelected] = useState<number>(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [showEndScreen, setShowEndScreen] = useState(false);
+  const [showVideoNotice, setShowVideoNotice] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
@@ -103,7 +104,13 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(tiles));
+    const hasVideos = tiles.some((t) => t.videoName);
+    if (hasVideos) setShowVideoNotice(true);
+  }, []);
+
+  useEffect(() => {
+    const tilesWithoutVideo = tiles.map((t) => ({ ...t, videoUrl: null }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(tilesWithoutVideo));
   }, [tiles]);
 
   const handleCountChange = (count: number) => {
@@ -156,6 +163,19 @@ const Index = () => {
           className="hidden"
           onChange={handleVideoSelect}
         />
+
+        {showVideoNotice && (
+          <div
+            className="fixed top-4 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-3 rounded-2xl text-white text-sm shadow-lg"
+            style={{ background: "rgba(0,0,0,0.6)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.2)", maxWidth: "90vw" }}
+          >
+            <Icon name="Info" size={16} className="shrink-0" />
+            <span>Видео нужно выбрать заново — они не сохраняются после перезапуска</span>
+            <button onClick={() => setShowVideoNotice(false)} className="ml-1 opacity-70 hover:opacity-100">
+              <Icon name="X" size={16} />
+            </button>
+          </div>
+        )}
 
         <Sheet>
           <SheetTrigger asChild>
