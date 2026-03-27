@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ThemeProvider } from "next-themes";
 import { MeshGradient } from "@/components/waitlist";
 import { Button } from "@/components/ui/button";
@@ -47,12 +47,32 @@ const PRESET_COLORS = [
   "rgba(0, 0, 0, 0.35)",
 ];
 
+const STORAGE_KEY = "tiles_config";
+
+const loadTiles = (): TileConfig[] => {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      const parsed = JSON.parse(saved) as TileConfig[];
+      return parsed.map((t) => ({ ...defaultTile(), ...t, videoUrl: null, videoName: null }));
+    }
+  } catch (e) {
+    console.error(e);
+  }
+  return Array.from({ length: 6 }, defaultTile);
+};
+
 const Index = () => {
-  const [tiles, setTiles] = useState<TileConfig[]>(Array.from({ length: 6 }, defaultTile));
+  const [tiles, setTiles] = useState<TileConfig[]>(loadTiles);
   const [selected, setSelected] = useState<number>(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [showEndScreen, setShowEndScreen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    const toSave = tiles.map((t) => ({ ...t, videoUrl: null, videoName: null }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
+  }, [tiles]);
 
   const update = (index: number, patch: Partial<TileConfig>) => {
     setTiles((prev) => prev.map((t, i) => (i === index ? { ...t, ...patch } : t)));
