@@ -36,15 +36,17 @@ const Index = () => {
             {tiles.map((tile, i) => (
               <div
                 key={i}
-                className="w-24 h-24 sm:w-36 sm:h-36 rounded-3xl flex items-center justify-center"
+                className="w-28 h-28 sm:w-40 sm:h-40 rounded-3xl flex items-center justify-center"
                 style={{
                   background: "rgba(255, 255, 255, 0.15)",
                   backdropFilter: "blur(12px)",
                   border: "1px solid rgba(255, 255, 255, 0.25)",
                 }}
               >
-                <Icon name={tile.icon} size={72} className="text-white hidden sm:block" />
-                <Icon name={tile.icon} size={52} className="text-white sm:hidden" />
+                <div className="w-[80%] h-[80%] flex items-center justify-center">
+                  <Icon name={tile.icon} size={96} className="text-white hidden sm:block" />
+                  <Icon name={tile.icon} size={72} className="text-white sm:hidden" />
+                </div>
               </div>
             ))}
           </div>
