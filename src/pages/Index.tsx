@@ -57,6 +57,7 @@ const Index = () => {
   const [tiles, setTiles] = useState<TileConfig[]>(Array.from({ length: 6 }, defaultTile));
   const [selected, setSelected] = useState<number>(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const [showEndScreen, setShowEndScreen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const update = (index: number, patch: Partial<TileConfig>) => {
@@ -303,7 +304,7 @@ const Index = () => {
           </div>
         </div>
 
-        <Dialog open={!!playingVideo} onOpenChange={(o) => !o && setPlayingVideo(null)}>
+        <Dialog open={!!playingVideo && !showEndScreen} onOpenChange={(o) => !o && setPlayingVideo(null)}>
           <DialogContent className="max-w-4xl w-full p-0 overflow-hidden rounded-2xl bg-black border-0">
             <button
               onClick={() => setPlayingVideo(null)}
@@ -317,8 +318,33 @@ const Index = () => {
                 controls
                 autoPlay
                 className="w-full h-full max-h-[80vh]"
+                onEnded={() => { setShowEndScreen(true); }}
               />
             )}
+          </DialogContent>
+        </Dialog>
+
+        <Dialog open={showEndScreen} onOpenChange={() => {}}>
+          <DialogContent className="max-w-sm w-full rounded-3xl border-0 p-8 flex flex-col items-center gap-6 text-center [&>button]:hidden">
+            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10">
+              <Icon name="Shield" size={40} className="text-primary" />
+            </div>
+            <p className="text-xl font-semibold leading-snug">Хотите защитить свой смартфон?</p>
+            <div className="flex gap-3 w-full">
+              <Button
+                className="flex-1"
+                variant="outline"
+                onClick={() => { setShowEndScreen(false); setPlayingVideo(null); }}
+              >
+                ДА
+              </Button>
+              <Button
+                className="flex-1"
+                onClick={() => { setShowEndScreen(false); setPlayingVideo(null); }}
+              >
+                Очень
+              </Button>
+            </div>
           </DialogContent>
         </Dialog>
       </div>
