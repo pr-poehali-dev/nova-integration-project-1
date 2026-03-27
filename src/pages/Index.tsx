@@ -79,7 +79,7 @@ const Index = () => {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <div className="antialiased max-w-screen min-h-svh bg-slate-1">
+      <div className="antialiased bg-slate-1 w-screen h-screen overflow-hidden">
         <MeshGradient
           colors={["#001c80", "#1ac7ff", "#04ffb1", "#ff1ff1"]}
           style={{ position: "fixed", top: 0, left: 0, zIndex: 0, width: "100%", height: "100%" }}
@@ -256,8 +256,8 @@ const Index = () => {
           </SheetContent>
         </Sheet>
 
-        <div className="relative z-[1] flex min-h-screen items-center justify-center p-[10vw]">
-          <div className="grid grid-cols-3 gap-[3vw] w-full" style={{ aspectRatio: "3/2" }}>
+        <div className="relative z-[1] flex w-screen h-screen items-center justify-center p-[5vw]">
+          <div className="grid grid-cols-3 gap-[2vw] w-full h-full">
             {tiles.map((t, i) => (
               <div
                 key={i}
