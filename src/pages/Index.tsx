@@ -48,22 +48,33 @@ const PRESET_COLORS = [
 ];
 
 const STORAGE_KEY = "tiles_config";
+const COUNT_KEY = "tiles_count";
+const TILE_COUNTS = [6, 8, 10];
 
-const loadTiles = (): TileConfig[] => {
+const loadTileCount = (): number => {
+  const saved = localStorage.getItem(COUNT_KEY);
+  const n = saved ? parseInt(saved) : 6;
+  return TILE_COUNTS.includes(n) ? n : 6;
+};
+
+const loadTiles = (count: number): TileConfig[] => {
   try {
     const saved = localStorage.getItem(STORAGE_KEY);
     if (saved) {
       const parsed = JSON.parse(saved) as TileConfig[];
-      return parsed.map((t) => ({ ...defaultTile(), ...t, videoUrl: null, videoName: null }));
+      const result = parsed.map((t) => ({ ...defaultTile(), ...t, videoUrl: null, videoName: null }));
+      while (result.length < count) result.push(defaultTile());
+      return result.slice(0, count);
     }
   } catch (e) {
     console.error(e);
   }
-  return Array.from({ length: 6 }, defaultTile);
+  return Array.from({ length: count }, defaultTile);
 };
 
 const Index = () => {
-  const [tiles, setTiles] = useState<TileConfig[]>(loadTiles);
+  const [tileCount, setTileCount] = useState<number>(loadTileCount);
+  const [tiles, setTiles] = useState<TileConfig[]>(() => loadTiles(loadTileCount()));
   const [selected, setSelected] = useState<number>(0);
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [showEndScreen, setShowEndScreen] = useState(false);
@@ -73,6 +84,18 @@ const Index = () => {
     const toSave = tiles.map((t) => ({ ...t, videoUrl: null, videoName: null }));
     localStorage.setItem(STORAGE_KEY, JSON.stringify(toSave));
   }, [tiles]);
+
+  const handleCountChange = (count: number) => {
+    setTileCount(count);
+    localStorage.setItem(COUNT_KEY, String(count));
+    setTiles((prev) => {
+      if (count > prev.length) {
+        return [...prev, ...Array.from({ length: count - prev.length }, defaultTile)];
+      }
+      return prev.slice(0, count);
+    });
+    setSelected((s) => (s >= count ? count - 1 : s));
+  };
 
   const update = (index: number, patch: Partial<TileConfig>) => {
     setTiles((prev) => prev.map((t, i) => (i === index ? { ...t, ...patch } : t)));
@@ -122,6 +145,23 @@ const Index = () => {
             <SheetHeader>
               <SheetTitle className="text-xl">Настройки карточек</SheetTitle>
             </SheetHeader>
+
+            <div className="flex flex-col gap-3">
+              <p className="text-base font-medium">Количество карточек</p>
+              <div className="flex gap-2">
+                {TILE_COUNTS.map((c) => (
+                  <Button
+                    key={c}
+                    size="lg"
+                    variant={tileCount === c ? "default" : "outline"}
+                    onClick={() => handleCountChange(c)}
+                    className="flex-1 h-12 text-base"
+                  >
+                    {c}
+                  </Button>
+                ))}
+              </div>
+            </div>
 
             <div className="flex flex-col gap-3">
               <p className="text-base text-muted-foreground font-medium">Выберите карточку</p>
@@ -275,7 +315,7 @@ const Index = () => {
         </Sheet>
 
         <div className="relative z-[1] flex w-screen h-screen items-center justify-center p-[5vw]">
-          <div className="grid grid-cols-3 gap-[2vw] w-full h-full">
+          <div className={`grid gap-[2vw] w-full h-full ${tileCount === 6 ? "grid-cols-3" : tileCount === 8 ? "grid-cols-4" : "grid-cols-5"}`}>
             {tiles.map((t, i) => (
               <div
                 key={i}
