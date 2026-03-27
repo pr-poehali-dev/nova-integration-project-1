@@ -79,6 +79,28 @@ const Index = () => {
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [showEndScreen, setShowEndScreen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const wakeLockRef = useRef<WakeLockSentinel | null>(null);
+
+  useEffect(() => {
+    const requestWakeLock = async () => {
+      try {
+        if ("wakeLock" in navigator) {
+          wakeLockRef.current = await navigator.wakeLock.request("screen");
+        }
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    requestWakeLock();
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") requestWakeLock();
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      wakeLockRef.current?.release();
+    };
+  }, []);
 
   useEffect(() => {
     const toSave = tiles.map((t) => ({ ...t, videoUrl: null, videoName: null }));
