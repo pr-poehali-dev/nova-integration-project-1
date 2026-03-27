@@ -333,6 +333,10 @@ const Index = () => {
                 </Button>
               )}
             </div>
+
+            <p className="text-xs text-muted-foreground text-center leading-relaxed mt-2">
+              Разработано Экспертом из Рязани для ЦехОпт из Казани.{"\n"}Заказать пленки — @Ceh_OPT_Kazan
+            </p>
           </SheetContent>
         </Sheet>
 
