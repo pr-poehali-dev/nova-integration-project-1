@@ -1,15 +1,7 @@
 import { ThemeProvider } from "next-themes";
 import { MeshGradient } from "@/components/waitlist";
-import Icon from "@/components/ui/icon";
 
-const tiles = [
-  { icon: "Zap" },
-  { icon: "Globe" },
-  { icon: "Layers" },
-  { icon: "Shield" },
-  { icon: "Star" },
-  { icon: "Rocket" },
-];
+const tiles = [0, 1, 2, 3, 4, 5];
 
 const Index = () => {
   return (
@@ -33,20 +25,16 @@ const Index = () => {
         />
         <div className="relative z-[1] flex min-h-screen items-center justify-center p-[10vw]">
           <div className="grid grid-cols-3 gap-[3vw] w-full h-full" style={{ aspectRatio: "3/2" }}>
-            {tiles.map((tile, i) => (
+            {tiles.map((_, i) => (
               <div
                 key={i}
-                className="rounded-3xl flex items-center justify-center"
+                className="rounded-3xl"
                 style={{
                   background: "rgba(255, 255, 255, 0.15)",
                   backdropFilter: "blur(12px)",
                   border: "1px solid rgba(255, 255, 255, 0.25)",
                 }}
-              >
-                <div className="w-[80%] h-[80%] flex items-center justify-center">
-                  <Icon name={tile.icon} className="text-white w-[80%] h-[80%]" />
-                </div>
-              </div>
+              />
             ))}
           </div>
         </div>
