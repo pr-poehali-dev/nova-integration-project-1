@@ -385,7 +385,7 @@ const Index = () => {
                       {t.text}
                     </span>
                   ) : (
-                    <span className="text-white/30 text-lg">Карточка {i + 1}</span>
+                    <span className="text-white/30 text-lg">Пленка {i + 1}</span>
                   )}
                   {t.videoUrl && (
                     <div className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
