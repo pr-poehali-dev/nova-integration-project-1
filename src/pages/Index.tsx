@@ -21,7 +21,7 @@ type TileConfig = {
 
 const defaultTile = (): TileConfig => ({
   text: "",
-  fontSize: 24,
+  fontSize: 32,
   bold: false,
   italic: false,
   align: "center",
@@ -32,14 +32,8 @@ const defaultTile = (): TileConfig => ({
 });
 
 const PRESET_TEXT_COLORS = [
-  "#ffffff",
-  "#000000",
-  "#3b82f6",
-  "#10b981",
-  "#ef4444",
-  "#f59e0b",
-  "#8b5cf6",
-  "#ec4899",
+  "#ffffff", "#000000", "#3b82f6", "#10b981",
+  "#ef4444", "#f59e0b", "#8b5cf6", "#ec4899",
 ];
 
 const PRESET_COLORS = [
@@ -80,7 +74,7 @@ const Index = () => {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-      <div className="antialiased bg-slate-1 w-screen h-screen overflow-hidden">
+      <div className="antialiased bg-slate-1 w-screen h-screen overflow-hidden touch-none select-none">
         <MeshGradient
           colors={["#001c80", "#1ac7ff", "#04ffb1", "#ff1ff1"]}
           style={{ position: "fixed", top: 0, left: 0, zIndex: 0, width: "100%", height: "100%" }}
@@ -97,29 +91,29 @@ const Index = () => {
         <Sheet>
           <SheetTrigger asChild>
             <button
-              className="fixed top-3 right-3 z-50 flex items-center justify-center w-7 h-7 rounded-full text-white transition-all"
+              className="fixed top-4 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-full text-white transition-all active:scale-95"
               style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.3)" }}
             >
-              <Icon name="Settings" size={13} />
+              <Icon name="Settings" size={18} />
             </button>
           </SheetTrigger>
 
-          <SheetContent side="right" className="w-80 flex flex-col gap-6 overflow-y-auto">
+          <SheetContent side="right" className="w-[360px] flex flex-col gap-6 overflow-y-auto pb-10">
             <SheetHeader>
-              <SheetTitle>Настройки карточек</SheetTitle>
+              <SheetTitle className="text-xl">Настройки карточек</SheetTitle>
             </SheetHeader>
 
             <div className="flex flex-col gap-3">
-              <p className="text-sm text-muted-foreground font-medium">Выберите карточку</p>
+              <p className="text-base text-muted-foreground font-medium">Выберите карточку</p>
               <div className="grid grid-cols-3 gap-2">
                 {tiles.map((t, i) => (
                   <button
                     key={i}
                     onClick={() => setSelected(i)}
-                    className={`rounded-xl p-2 text-xs border transition-all truncate ${
+                    className={`rounded-xl py-3 px-2 text-sm border transition-all truncate ${
                       selected === i
                         ? "border-primary bg-primary/10 text-primary font-medium"
-                        : "border-border bg-muted text-muted-foreground hover:border-primary/50"
+                        : "border-border bg-muted text-muted-foreground"
                     }`}
                   >
                     {t.text ? t.text.slice(0, 10) : `Карточка ${i + 1}`}
@@ -129,43 +123,44 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Текст</label>
+              <label className="text-base font-medium">Текст</label>
               <textarea
                 value={tile.text}
                 onChange={(e) => update(selected, { text: e.target.value })}
                 placeholder="Введите текст..."
                 rows={4}
-                className="w-full rounded-xl border border-border bg-muted px-3 py-2 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full rounded-xl border border-border bg-muted px-4 py-3 text-base resize-none focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Размер текста: {tile.fontSize}px</label>
+            <div className="flex flex-col gap-3">
+              <label className="text-base font-medium">Размер текста: {tile.fontSize}px</label>
               <Slider
                 min={12}
-                max={72}
+                max={96}
                 step={2}
                 value={[tile.fontSize]}
                 onValueChange={([v]) => update(selected, { fontSize: v })}
+                className="py-2"
               />
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Стиль</label>
-              <div className="flex gap-2">
+              <label className="text-base font-medium">Стиль</label>
+              <div className="flex gap-3">
                 <Button
-                  size="sm"
+                  size="lg"
                   variant={tile.bold ? "default" : "outline"}
                   onClick={() => update(selected, { bold: !tile.bold })}
-                  className="font-bold"
+                  className="font-bold text-lg w-14 h-12"
                 >
                   B
                 </Button>
                 <Button
-                  size="sm"
+                  size="lg"
                   variant={tile.italic ? "default" : "outline"}
                   onClick={() => update(selected, { italic: !tile.italic })}
-                  className="italic"
+                  className="italic text-lg w-14 h-12"
                 >
                   I
                 </Button>
@@ -173,18 +168,19 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Выравнивание</label>
-              <div className="flex gap-2">
+              <label className="text-base font-medium">Выравнивание</label>
+              <div className="flex gap-3">
                 {(["left", "center", "right"] as const).map((a) => (
                   <Button
                     key={a}
-                    size="sm"
+                    size="lg"
                     variant={tile.align === a ? "default" : "outline"}
                     onClick={() => update(selected, { align: a })}
+                    className="w-14 h-12"
                   >
                     <Icon
                       name={a === "left" ? "AlignLeft" : a === "center" ? "AlignCenter" : "AlignRight"}
-                      size={14}
+                      size={20}
                     />
                   </Button>
                 ))}
@@ -192,13 +188,13 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Цвет текста</label>
-              <div className="flex flex-wrap gap-2">
+              <label className="text-base font-medium">Цвет текста</label>
+              <div className="flex flex-wrap gap-3">
                 {PRESET_TEXT_COLORS.map((color) => (
                   <button
                     key={color}
                     onClick={() => update(selected, { textColor: color })}
-                    className="w-8 h-8 rounded-lg border-2 transition-all"
+                    className="w-11 h-11 rounded-xl border-2 transition-all active:scale-95"
                     style={{
                       background: color,
                       borderColor: tile.textColor === color ? "hsl(var(--primary))" : "hsl(var(--border))",
@@ -209,13 +205,13 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Цвет фона</label>
-              <div className="flex flex-wrap gap-2">
+              <label className="text-base font-medium">Цвет фона</label>
+              <div className="flex flex-wrap gap-3">
                 {PRESET_COLORS.map((color) => (
                   <button
                     key={color}
                     onClick={() => update(selected, { bgColor: color })}
-                    className="w-8 h-8 rounded-lg border-2 transition-all"
+                    className="w-11 h-11 rounded-xl border-2 transition-all active:scale-95"
                     style={{
                       background: color,
                       borderColor: tile.bgColor === color ? "hsl(var(--primary))" : "transparent",
@@ -227,29 +223,30 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-medium">Видео</label>
+              <label className="text-base font-medium">Видео</label>
               {tile.videoName ? (
-                <div className="flex flex-col gap-2">
-                  <div className="flex items-center gap-2 rounded-xl border border-border bg-muted px-3 py-2 text-sm">
-                    <Icon name="Video" size={14} className="text-primary shrink-0" />
-                    <span className="truncate text-xs text-muted-foreground">{tile.videoName}</span>
+                <div className="flex flex-col gap-3">
+                  <div className="flex items-center gap-2 rounded-xl border border-border bg-muted px-4 py-3">
+                    <Icon name="Video" size={18} className="text-primary shrink-0" />
+                    <span className="truncate text-sm text-muted-foreground">{tile.videoName}</span>
                   </div>
                   <div className="flex gap-2">
-                    <Button size="sm" variant="outline" className="flex-1" onClick={() => fileInputRef.current?.click()}>
+                    <Button size="lg" variant="outline" className="flex-1 h-12" onClick={() => fileInputRef.current?.click()}>
                       Заменить
                     </Button>
-                    <Button size="sm" variant="outline" onClick={() => update(selected, { videoUrl: null, videoName: null })}>
-                      <Icon name="Trash2" size={14} />
+                    <Button size="lg" variant="outline" className="h-12 w-12" onClick={() => update(selected, { videoUrl: null, videoName: null })}>
+                      <Icon name="Trash2" size={18} />
                     </Button>
                   </div>
                 </div>
               ) : (
                 <Button
+                  size="lg"
                   variant="outline"
-                  className="w-full flex items-center gap-2"
+                  className="w-full h-14 flex items-center gap-2 text-base"
                   onClick={() => fileInputRef.current?.click()}
                 >
-                  <Icon name="Upload" size={14} />
+                  <Icon name="Upload" size={18} />
                   Выбрать видео
                 </Button>
               )}
@@ -263,8 +260,8 @@ const Index = () => {
               <div
                 key={i}
                 onClick={() => handleTileClick(t)}
-                className={`rounded-3xl flex items-center justify-center p-4 transition-all ${
-                  t.videoUrl ? "cursor-pointer hover:scale-[1.03] active:scale-[0.98]" : ""
+                className={`rounded-3xl flex items-center justify-center p-6 transition-all ${
+                  t.videoUrl ? "cursor-pointer active:scale-[0.97]" : ""
                 }`}
                 style={{
                   background: t.bgColor,
@@ -272,6 +269,7 @@ const Index = () => {
                   border: t.videoUrl
                     ? "1px solid rgba(255, 255, 255, 0.5)"
                     : "1px solid rgba(255, 255, 255, 0.25)",
+                  WebkitTapHighlightColor: "transparent",
                 }}
               >
                 <div className="relative w-full h-full flex items-center justify-center">
@@ -291,11 +289,11 @@ const Index = () => {
                       {t.text}
                     </span>
                   ) : (
-                    <span className="text-white/30 text-sm">Карточка {i + 1}</span>
+                    <span className="text-white/30 text-lg">Карточка {i + 1}</span>
                   )}
                   {t.videoUrl && (
-                    <div className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
-                      <Icon name="Play" size={10} className="text-white ml-0.5" />
+                    <div className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                      <Icon name="Play" size={14} className="text-white ml-0.5" />
                     </div>
                   )}
                 </div>
@@ -308,38 +306,41 @@ const Index = () => {
           <DialogContent className="max-w-4xl w-full p-0 overflow-hidden rounded-2xl bg-black border-0">
             <button
               onClick={() => setPlayingVideo(null)}
-              className="absolute top-3 right-3 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+              className="absolute top-4 right-4 z-10 flex items-center justify-center w-12 h-12 rounded-full bg-black/60 text-white"
             >
-              <Icon name="X" size={16} />
+              <Icon name="X" size={20} />
             </button>
             {playingVideo && (
               <video
                 src={playingVideo}
                 controls
                 autoPlay
+                playsInline
                 className="w-full h-full max-h-[80vh]"
-                onEnded={() => { setShowEndScreen(true); }}
+                onEnded={() => setShowEndScreen(true)}
               />
             )}
           </DialogContent>
         </Dialog>
 
         <Dialog open={showEndScreen} onOpenChange={() => {}}>
-          <DialogContent className="max-w-sm w-full rounded-3xl border-0 p-8 flex flex-col items-center gap-6 text-center [&>button]:hidden">
-            <div className="flex items-center justify-center w-20 h-20 rounded-full bg-primary/10">
-              <Icon name="Shield" size={40} className="text-primary" />
+          <DialogContent className="max-w-sm w-full rounded-3xl border-0 p-10 flex flex-col items-center gap-8 text-center [&>button]:hidden">
+            <div className="flex items-center justify-center w-24 h-24 rounded-full bg-primary/10">
+              <Icon name="Shield" size={52} className="text-primary" />
             </div>
-            <p className="text-xl font-semibold leading-snug">Хотите защитить свой смартфон?</p>
-            <div className="flex gap-3 w-full">
+            <p className="text-2xl font-semibold leading-snug">Хотите защитить свой смартфон?</p>
+            <div className="flex gap-4 w-full">
               <Button
-                className="flex-1"
+                size="lg"
+                className="flex-1 h-14 text-lg"
                 variant="outline"
                 onClick={() => { setShowEndScreen(false); setPlayingVideo(null); }}
               >
                 ДА
               </Button>
               <Button
-                className="flex-1"
+                size="lg"
+                className="flex-1 h-14 text-lg"
                 onClick={() => { setShowEndScreen(false); setPlayingVideo(null); }}
               >
                 Очень
