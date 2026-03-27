@@ -16,6 +16,7 @@ type TileConfig = {
   videoUrl: string | null;
   videoName: string | null;
   bgColor: string;
+  textColor: string;
 };
 
 const defaultTile = (): TileConfig => ({
@@ -27,7 +28,19 @@ const defaultTile = (): TileConfig => ({
   videoUrl: null,
   videoName: null,
   bgColor: "rgba(255, 255, 255, 0.15)",
+  textColor: "#ffffff",
 });
+
+const PRESET_TEXT_COLORS = [
+  "#ffffff",
+  "#000000",
+  "#3b82f6",
+  "#10b981",
+  "#ef4444",
+  "#f59e0b",
+  "#8b5cf6",
+  "#ec4899",
+];
 
 const PRESET_COLORS = [
   "rgba(255, 255, 255, 0.15)",
@@ -179,6 +192,23 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Цвет текста</label>
+              <div className="flex flex-wrap gap-2">
+                {PRESET_TEXT_COLORS.map((color) => (
+                  <button
+                    key={color}
+                    onClick={() => update(selected, { textColor: color })}
+                    className="w-8 h-8 rounded-lg border-2 transition-all"
+                    style={{
+                      background: color,
+                      borderColor: tile.textColor === color ? "hsl(var(--primary))" : "hsl(var(--border))",
+                    }}
+                  />
+                ))}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2">
               <label className="text-sm font-medium">Цвет фона</label>
               <div className="flex flex-wrap gap-2">
                 {PRESET_COLORS.map((color) => (
@@ -252,7 +282,7 @@ const Index = () => {
                         fontWeight: t.bold ? "bold" : "normal",
                         fontStyle: t.italic ? "italic" : "normal",
                         textAlign: t.align,
-                        color: "white",
+                        color: t.textColor,
                         lineHeight: 1.2,
                         wordBreak: "break-word",
                         width: "100%",
