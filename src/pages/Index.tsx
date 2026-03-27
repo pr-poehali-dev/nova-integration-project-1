@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { ThemeProvider } from "next-themes";
 import { MeshGradient } from "@/components/waitlist";
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import Icon from "@/components/ui/icon";
 
 type TileConfig = {
@@ -12,6 +13,8 @@ type TileConfig = {
   bold: boolean;
   italic: boolean;
   align: "left" | "center" | "right";
+  videoUrl: string | null;
+  videoName: string | null;
 };
 
 const defaultTile = (): TileConfig => ({
@@ -20,14 +23,30 @@ const defaultTile = (): TileConfig => ({
   bold: false,
   italic: false,
   align: "center",
+  videoUrl: null,
+  videoName: null,
 });
 
 const Index = () => {
   const [tiles, setTiles] = useState<TileConfig[]>(Array.from({ length: 6 }, defaultTile));
   const [selected, setSelected] = useState<number>(0);
+  const [playingVideo, setPlayingVideo] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const update = (index: number, patch: Partial<TileConfig>) => {
     setTiles((prev) => prev.map((t, i) => (i === index ? { ...t, ...patch } : t)));
+  };
+
+  const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    update(selected, { videoUrl: url, videoName: file.name });
+    e.target.value = "";
+  };
+
+  const handleTileClick = (t: TileConfig) => {
+    if (t.videoUrl) setPlayingVideo(t.videoUrl);
   };
 
   const tile = tiles[selected];
@@ -38,6 +57,14 @@ const Index = () => {
         <MeshGradient
           colors={["#001c80", "#1ac7ff", "#04ffb1", "#ff1ff1"]}
           style={{ position: "fixed", top: 0, left: 0, zIndex: 0, width: "100%", height: "100%" }}
+        />
+
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="video/*"
+          className="hidden"
+          onChange={handleVideoSelect}
         />
 
         <Sheet>
@@ -137,6 +164,35 @@ const Index = () => {
                 ))}
               </div>
             </div>
+
+            <div className="flex flex-col gap-2">
+              <label className="text-sm font-medium">Видео</label>
+              {tile.videoName ? (
+                <div className="flex flex-col gap-2">
+                  <div className="flex items-center gap-2 rounded-xl border border-border bg-muted px-3 py-2 text-sm">
+                    <Icon name="Video" size={14} className="text-primary shrink-0" />
+                    <span className="truncate text-xs text-muted-foreground">{tile.videoName}</span>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="sm" variant="outline" className="flex-1" onClick={() => fileInputRef.current?.click()}>
+                      Заменить
+                    </Button>
+                    <Button size="sm" variant="outline" onClick={() => update(selected, { videoUrl: null, videoName: null })}>
+                      <Icon name="Trash2" size={14} />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  variant="outline"
+                  className="w-full flex items-center gap-2"
+                  onClick={() => fileInputRef.current?.click()}
+                >
+                  <Icon name="Upload" size={14} />
+                  Выбрать видео
+                </Button>
+              )}
+            </div>
           </SheetContent>
         </Sheet>
 
@@ -145,35 +201,66 @@ const Index = () => {
             {tiles.map((t, i) => (
               <div
                 key={i}
-                className="rounded-3xl flex items-center justify-center p-4"
+                onClick={() => handleTileClick(t)}
+                className={`rounded-3xl flex items-center justify-center p-4 transition-all ${
+                  t.videoUrl ? "cursor-pointer hover:scale-[1.03] active:scale-[0.98]" : ""
+                }`}
                 style={{
                   background: "rgba(255, 255, 255, 0.15)",
                   backdropFilter: "blur(12px)",
-                  border: "1px solid rgba(255, 255, 255, 0.25)",
+                  border: t.videoUrl
+                    ? "1px solid rgba(255, 255, 255, 0.5)"
+                    : "1px solid rgba(255, 255, 255, 0.25)",
                 }}
               >
-                {t.text ? (
-                  <span
-                    style={{
-                      fontSize: t.fontSize,
-                      fontWeight: t.bold ? "bold" : "normal",
-                      fontStyle: t.italic ? "italic" : "normal",
-                      textAlign: t.align,
-                      color: "white",
-                      lineHeight: 1.2,
-                      wordBreak: "break-word",
-                      width: "100%",
-                    }}
-                  >
-                    {t.text}
-                  </span>
-                ) : (
-                  <span className="text-white/30 text-sm">Карточка {i + 1}</span>
-                )}
+                <div className="relative w-full h-full flex items-center justify-center">
+                  {t.text ? (
+                    <span
+                      style={{
+                        fontSize: t.fontSize,
+                        fontWeight: t.bold ? "bold" : "normal",
+                        fontStyle: t.italic ? "italic" : "normal",
+                        textAlign: t.align,
+                        color: "white",
+                        lineHeight: 1.2,
+                        wordBreak: "break-word",
+                        width: "100%",
+                      }}
+                    >
+                      {t.text}
+                    </span>
+                  ) : (
+                    <span className="text-white/30 text-sm">Карточка {i + 1}</span>
+                  )}
+                  {t.videoUrl && (
+                    <div className="absolute bottom-1 right-1 w-6 h-6 rounded-full bg-white/20 flex items-center justify-center">
+                      <Icon name="Play" size={10} className="text-white ml-0.5" />
+                    </div>
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
+
+        <Dialog open={!!playingVideo} onOpenChange={(o) => !o && setPlayingVideo(null)}>
+          <DialogContent className="max-w-4xl w-full p-0 overflow-hidden rounded-2xl bg-black border-0">
+            <button
+              onClick={() => setPlayingVideo(null)}
+              className="absolute top-3 right-3 z-10 flex items-center justify-center w-8 h-8 rounded-full bg-black/60 text-white hover:bg-black/80 transition-colors"
+            >
+              <Icon name="X" size={16} />
+            </button>
+            {playingVideo && (
+              <video
+                src={playingVideo}
+                controls
+                autoPlay
+                className="w-full h-full max-h-[80vh]"
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </ThemeProvider>
   );
