@@ -377,6 +377,8 @@ const Index = () => {
                         color: t.textColor,
                         lineHeight: 1.2,
                         wordBreak: "break-word",
+                        overflowWrap: "break-word",
+                        whiteSpace: "pre-wrap",
                         width: "100%",
                       }}
                     >
