@@ -17,6 +17,8 @@ type TileConfig = {
   videoName: string | null;
   bgColor: string;
   textColor: string;
+  bgImage: string | null;
+  bgImageOpacity: number;
 };
 
 const defaultTile = (): TileConfig => ({
@@ -29,6 +31,8 @@ const defaultTile = (): TileConfig => ({
   videoName: null,
   bgColor: "rgba(255, 255, 255, 0.15)",
   textColor: "#ffffff",
+  bgImage: null,
+  bgImageOpacity: 0.5,
 });
 
 const PRESET_TEXT_COLORS = [
@@ -81,6 +85,7 @@ const Index = () => {
   const [showVideoNotice, setShowVideoNotice] = useState(false);
   const [screenOff, setScreenOff] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const imageInputRef = useRef<HTMLInputElement>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
   useEffect(() => {
@@ -130,6 +135,14 @@ const Index = () => {
     setTiles((prev) => prev.map((t, i) => (i === index ? { ...t, ...patch } : t)));
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    update(selected, { bgImage: url });
+    e.target.value = "";
+  };
+
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -163,6 +176,13 @@ const Index = () => {
           accept="video/*"
           className="hidden"
           onChange={handleVideoSelect}
+        />
+        <input
+          ref={imageInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageSelect}
         />
 
         {showVideoNotice && (
@@ -338,6 +358,46 @@ const Index = () => {
             </div>
 
             <div className="flex flex-col gap-2">
+              <label className="text-base font-medium">Фоновое изображение</label>
+              {tile.bgImage ? (
+                <div className="flex flex-col gap-3">
+                  <div
+                    className="w-full h-24 rounded-xl border border-border bg-muted bg-center bg-cover"
+                    style={{ backgroundImage: `url(${tile.bgImage})` }}
+                  />
+                  <div className="flex flex-col gap-1">
+                    <label className="text-sm text-muted-foreground">Прозрачность: {Math.round(tile.bgImageOpacity * 100)}%</label>
+                    <Slider
+                      min={0}
+                      max={1}
+                      step={0.05}
+                      value={[tile.bgImageOpacity]}
+                      onValueChange={([v]) => update(selected, { bgImageOpacity: v })}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    <Button size="lg" variant="outline" className="flex-1 h-12" onClick={() => imageInputRef.current?.click()}>
+                      Заменить
+                    </Button>
+                    <Button size="lg" variant="outline" className="h-12 w-12" onClick={() => update(selected, { bgImage: null })}>
+                      <Icon name="Trash2" size={18} />
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="w-full h-14 flex items-center gap-2 text-base"
+                  onClick={() => imageInputRef.current?.click()}
+                >
+                  <Icon name="ImagePlus" size={18} />
+                  Выбрать изображение
+                </Button>
+              )}
+            </div>
+
+            <div className="flex flex-col gap-2">
               <label className="text-base font-medium">Видео</label>
               {tile.videoName ? (
                 <div className="flex flex-col gap-3">
@@ -391,9 +451,16 @@ const Index = () => {
                   WebkitTapHighlightColor: "transparent",
                 }}
               >
-                <div className="relative w-full h-full flex items-center justify-center">
+                <div className="relative w-full h-full flex items-center justify-center overflow-hidden rounded-3xl">
+                  {t.bgImage && (
+                    <div
+                      className="absolute inset-0 bg-center bg-cover"
+                      style={{ backgroundImage: `url(${t.bgImage})`, opacity: t.bgImageOpacity }}
+                    />
+                  )}
                   {t.text ? (
                     <span
+                      className="relative z-10"
                       style={{
                         fontSize: t.fontSize,
                         fontWeight: t.bold ? "bold" : "normal",
@@ -410,10 +477,10 @@ const Index = () => {
                       {t.text}
                     </span>
                   ) : (
-                    <span className="text-white/30 text-lg">Пленка {i + 1}</span>
+                    <span className="relative z-10 text-white/30 text-lg">Пленка {i + 1}</span>
                   )}
                   {t.videoUrl && (
-                    <div className="absolute bottom-1 right-1 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
+                    <div className="absolute bottom-1 right-1 z-10 w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                       <Icon name="Play" size={14} className="text-white ml-0.5" />
                     </div>
                   )}
