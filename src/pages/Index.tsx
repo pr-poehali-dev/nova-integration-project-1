@@ -181,8 +181,8 @@ const Index = () => {
         <Sheet>
           <button
             onClick={() => setScreenOff(true)}
-            className="fixed top-4 right-16 z-50 flex items-center justify-center w-10 h-10 rounded-full text-white transition-all active:scale-95"
-            style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.3)" }}
+            className="fixed top-4 left-4 z-50 flex items-center justify-center w-10 h-10 rounded-full text-white/60 transition-all active:scale-95"
+            style={{ background: "rgba(0,0,0,0.45)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.1)" }}
           >
             <Icon name="Moon" size={18} />
           </button>
