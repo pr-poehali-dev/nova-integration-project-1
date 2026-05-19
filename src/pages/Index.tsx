@@ -79,6 +79,7 @@ const Index = () => {
   const [playingVideo, setPlayingVideo] = useState<string | null>(null);
   const [showEndScreen, setShowEndScreen] = useState(false);
   const [showVideoNotice, setShowVideoNotice] = useState(false);
+  const [screenOff, setScreenOff] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const wakeLockRef = useRef<WakeLockSentinel | null>(null);
 
@@ -178,6 +179,14 @@ const Index = () => {
         )}
 
         <Sheet>
+          <button
+            onClick={() => setScreenOff(true)}
+            className="fixed top-4 right-16 z-50 flex items-center justify-center w-10 h-10 rounded-full text-white transition-all active:scale-95"
+            style={{ background: "rgba(255,255,255,0.2)", backdropFilter: "blur(12px)", border: "1px solid rgba(255,255,255,0.3)" }}
+          >
+            <Icon name="Moon" size={18} />
+          </button>
+
           <SheetTrigger asChild>
             <button
               className="fixed top-4 right-4 z-50 flex items-center justify-center w-10 h-10 rounded-full text-white transition-all active:scale-95"
@@ -434,6 +443,14 @@ const Index = () => {
             )}
           </DialogContent>
         </Dialog>
+
+        {screenOff && (
+          <div
+            onClick={() => setScreenOff(false)}
+            className="fixed inset-0 z-[9999] bg-black"
+            style={{ cursor: "none" }}
+          />
+        )}
 
         <Dialog open={showEndScreen} onOpenChange={() => {}}>
           <DialogContent className="max-w-sm w-full rounded-3xl border-0 p-10 flex flex-col items-center gap-8 text-center [&>button]:hidden">
